@@ -1,0 +1,145 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: #f1f5f9;
+    --surface: #ffffff;
+    --primary: #d4af37;
+    --secondary: #f8fafc;
+    --accent: #e6c86e;
+    --text-main: #0f172a;
+    --text-muted: #475569;
+    --border: #e2e8f0;
+  }
+
+  .dark {
+    --background: #0f0f0f;
+    --surface: #1a1a1a;
+    --primary: #d4af37;
+    --secondary: #1f1f1f;
+    --accent: #e6c86e;
+    --text-main: #ffffff;
+    --text-muted: #9ca3af;
+    --border: rgba(255, 255, 255, 0.1);
+  }
+
+  html,
+  body,
+  #root {
+    @apply h-full transition-colors duration-500;
+  }
+
+  body {
+    @apply antialiased;
+    background-color: var(--background);
+    color: var(--text-main);
+  }
+}
+
+@layer components {
+
+  /* Glass Panel */
+  .glass-panel {
+    @apply backdrop-blur-md border rounded-2xl shadow-xl dark:shadow-2xl transition-all duration-300;
+
+    background-color: rgba(255, 255, 255, 0.8);
+    border-color: var(--border);
+  }
+
+  .dark .glass-panel {
+    background-color: rgba(26, 26, 26, 0.8);
+  }
+
+  /* Primary Button */
+  .btn-primary {
+    @apply px-6 py-2 font-bold rounded-xl transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed;
+
+    background-color: var(--primary);
+    color: black;
+    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
+  }
+
+  .btn-primary:hover {
+    background-color: var(--accent);
+    box-shadow: 0 8px 25px rgba(212, 175, 55, 0.4);
+  }
+
+  /* Secondary Button */
+  .btn-secondary {
+    @apply px-6 py-2 font-bold rounded-xl border transition-all duration-300 hover:shadow-lg disabled:opacity-50;
+
+    background-color: var(--secondary);
+    color: var(--text-main);
+    border-color: var(--border);
+  }
+
+  .btn-secondary:hover {
+    background-color: var(--surface);
+  }
+
+  /* Input Field */
+  .input-field {
+    @apply w-full rounded-xl px-4 py-3 border transition-all duration-300 focus:outline-none focus:ring-2;
+
+    background-color: var(--secondary);
+    color: var(--text-main);
+    border-color: var(--border);
+
+    --tw-ring-color: rgba(212, 175, 55, 0.2);
+  }
+
+  .input-field:focus {
+    border-color: var(--primary);
+  }
+
+  .input-field::placeholder {
+    color: rgba(71, 85, 105, 0.5);
+  }
+
+  .dark .input-field::placeholder {
+    color: rgba(156, 163, 175, 0.5);
+  }
+
+  /* Premium Date/Month Picker Styling */
+  input[type="date"]::-webkit-calendar-picker-indicator,
+  input[type="month"]::-webkit-calendar-picker-indicator {
+    @apply transition-all duration-300 cursor-pointer p-1 rounded-lg;
+
+    opacity: 0.6;
+  }
+
+  .dark input[type="date"]::-webkit-calendar-picker-indicator,
+  .dark input[type="month"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+  }
+
+  input[type="date"]::-webkit-calendar-picker-indicator:hover,
+  input[type="month"]::-webkit-calendar-picker-indicator:hover {
+    opacity: 1;
+    transform: scale(1.1);
+    background-color: rgba(212, 175, 55, 0.1);
+  }
+}
+
+/* Custom Scrollbar */
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: var(--background);
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(71, 85, 105, 0.2);
+  border-radius: 9999px;
+  transition: background-color 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(71, 85, 105, 0.4);
+}
