@@ -26,7 +26,9 @@ export default function LoginPage() {
     setIsLoading(true);
     setError('');
     try {
-      const res = await fetch('http://localhost:8000/api/token/', {
+      // const res = await fetch('http://localhost:8000/api/token/', {
+      const res = await fetch('http://54.160.151.122:8000/api/token/', {
+
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password })
