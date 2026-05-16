@@ -27,7 +27,7 @@ export default function LoginPage() {
     setError('');
     try {
       // const res = await fetch('http://localhost:8000/api/token/', {
-      const res = await fetch('http://54.160.151.122:8000/api/token/', {
+      const res = await fetch('https://54-160-151-122.sslip.io/api/token/', {
 
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

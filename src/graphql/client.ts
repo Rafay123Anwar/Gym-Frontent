@@ -3,7 +3,7 @@ import { setContext } from '@apollo/client/link/context';
 
 const httpLink = createHttpLink({
   // uri: 'http://localhost:8000/graphql/',
-  uri: 'http://54.160.151.122:8000/graphql/',
+  uri: 'https://54-160-151-122.sslip.io/graphql/',
 });
 
 const authLink = setContext((_, { headers }) => {
