@@ -2,7 +2,7 @@ import { ReactNode, useState } from 'react';
 import { Navigate, useLocation, Link } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { useThemeStore } from '../store/themeStore';
-import { LayoutDashboard, Users, CreditCard, Settings, LogOut, Menu, FileText, Layers, Sun, Moon } from 'lucide-react';
+import { LayoutDashboard, Users, CreditCard, Settings, LogOut, Menu, FileText, Layers, Sun, Moon, RefreshCw } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const NAV_ITEMS = [
@@ -10,6 +10,7 @@ const NAV_ITEMS = [
   { path: '/members', label: 'Members', icon: Users },
   { path: '/plans', label: 'Plans', icon: Layers },
   { path: '/payments', label: 'Payments', icon: CreditCard },
+  { path: '/renewals', label: 'Renewals', icon: RefreshCw },
   { path: '/reports', label: 'Reports', icon: FileText },
   { path: '/settings', label: 'Settings', icon: Settings },
 ];

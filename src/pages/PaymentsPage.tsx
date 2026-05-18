@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 
 import {
     gql,
@@ -7,13 +7,12 @@ import {
     useLazyQuery,
 } from '@apollo/client';
 
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import {
     Plus,
     Download,
     RefreshCw,
-    ChevronRight,
     User,
     Calendar,
     Loader2,
@@ -32,8 +31,6 @@ import Pagination from '../components/Pagination';
 
 import {
     LIVE_QUERY_NAMES,
-    GET_EXPIRED_FOR_RENEWAL,
-    GET_MEMBER_FOR_RENEW_NAV,
 } from '../graphql/queries';
 
 import { useModalStore } from '../store/modalStore';
@@ -124,6 +121,7 @@ interface PaymentRecord {
 
 export default function PaymentsPage() {
     const { showConfirm } = useModalStore();
+    const navigate = useNavigate();
 
     const [searchTerm, setSearchTerm] = useState('');
 
@@ -141,11 +139,6 @@ export default function PaymentsPage() {
     const [pageSize, setPageSize] =
         useState(10);
 
-    const [expiredPage, setExpiredPage] =
-        useState(1);
-
-    const expiredPageSize = 3;
-
     const [selectedMember, setSelectedMember] =
         useState<any | null>(null);
 
@@ -154,39 +147,8 @@ export default function PaymentsPage() {
 
     const historyPageSize = 5;
 
-    const [searchParams, setSearchParams] =
-        useSearchParams();
-
-    const renewParam =
-        searchParams.get('renew');
-
-    const consumedRenewRef =
-        useRef<string | null>(null);
-
     const [renewalPrefill, setRenewalPrefill] =
         useState<RenewalPrefill | null>(null);
-
-    const {
-        data: expiredRenewData,
-        refetch: refetchExpiredRenew,
-    } = useQuery(
-        GET_EXPIRED_FOR_RENEWAL,
-        {
-            fetchPolicy: 'cache-and-network',
-        }
-    );
-
-    const {
-        data: renewNavMember,
-    } = useQuery(
-        GET_MEMBER_FOR_RENEW_NAV,
-        {
-            variables: {
-                id: renewParam,
-            },
-            skip: !renewParam,
-        }
-    );
 
     const [
         loadHistory,
@@ -197,103 +159,6 @@ export default function PaymentsPage() {
     ] = useLazyQuery(
         GET_MEMBER_PAYMENT_HISTORY
     );
-
-    useEffect(() => {
-        if (!renewParam) {
-            consumedRenewRef.current = null;
-        }
-    }, [renewParam]);
-
-    useEffect(() => {
-        const rid = renewParam;
-
-        if (
-            !rid ||
-            !renewNavMember?.member
-        )
-            return;
-
-        if (
-            consumedRenewRef.current === rid
-        )
-            return;
-
-        const m = renewNavMember.member;
-
-        consumedRenewRef.current = rid;
-
-        if (m.status !== 'Expired') {
-            setSearchParams(
-                (prev) => {
-                    const n =
-                        new URLSearchParams(prev);
-
-                    n.delete('renew');
-
-                    return n;
-                },
-                { replace: true }
-            );
-
-            return;
-        }
-
-        setRenewalPrefill({
-            id: m.id,
-            fullName: m.fullName,
-            phoneNumber: m.phoneNumber,
-            expiryDate: m.expiryDate,
-            status: m.status,
-
-            membershipPlan: {
-                planName:
-                    m.membershipPlan.planName,
-
-                price:
-                    m.membershipPlan.price,
-            },
-        });
-
-        setIsModalOpen(true);
-
-        setSearchParams(
-            (prev) => {
-                const n =
-                    new URLSearchParams(prev);
-
-                n.delete('renew');
-
-                return n;
-            },
-            { replace: true }
-        );
-    }, [
-        renewParam,
-        renewNavMember,
-        setSearchParams,
-    ]);
-
-    const expiredForRenewal =
-        (
-            expiredRenewData?.allMembers
-                ?.results ?? []
-        ).filter(
-            (m: any) =>
-                m.status === 'Expired'
-        ) as RenewalPrefill[];
-
-    const paginatedExpired =
-        expiredForRenewal.slice(
-            (expiredPage - 1) *
-            expiredPageSize,
-            expiredPage * expiredPageSize
-        );
-
-    const expiredTotalPages =
-        Math.ceil(
-            expiredForRenewal.length /
-            expiredPageSize
-        );
 
     const {
         data,
@@ -468,6 +333,14 @@ export default function PaymentsPage() {
 
                 <div className="flex gap-3">
                     <button
+                        onClick={() => navigate('/renewals')}
+                        className="btn-secondary flex items-center justify-center py-3"
+                    >
+                        <RefreshCw className="w-5 h-5 mr-2" />
+                        Renewals
+                    </button>
+
+                    <button
                         onClick={handleExport}
                         className="btn-secondary flex items-center justify-center py-3"
                     >
@@ -489,147 +362,6 @@ export default function PaymentsPage() {
                     </button>
                 </div>
             </div>
-
-            {/* EXPIRED */}
-
-            {expiredForRenewal.length >
-                0 && (
-                    <div className="glass-panel p-6 border border-orange-500/20">
-                        <div className="flex justify-between items-center">
-                            <div>
-                                <h2 className="text-xl font-black text-textMain flex items-center gap-3">
-                                    <RefreshCw className="w-5 h-5 text-orange-400" />
-
-                                    Membership Renewals
-                                </h2>
-
-                                <p className="text-xs text-textMuted uppercase tracking-widest mt-2">
-                                    Expired members
-                                </p>
-                            </div>
-
-                            <div className="text-right">
-                                <p className="text-4xl font-black text-orange-400">
-                                    {
-                                        expiredForRenewal.length
-                                    }
-                                </p>
-
-                                <p className="text-xs text-textMuted uppercase tracking-widest">
-                                    Expired
-                                </p>
-                            </div>
-                        </div>
-
-                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-6">
-                            {paginatedExpired.map(
-                                (m) => (
-                                    <motion.div
-                                        whileHover={{
-                                            y: -4,
-                                        }}
-                                        key={m.id}
-                                        className="rounded-3xl border border-white/10 bg-white/[0.04] p-5"
-                                    >
-                                        <div className="flex justify-between">
-                                            <div>
-                                                <h3 className="font-black text-textMain text-lg">
-                                                    {m.fullName}
-                                                </h3>
-
-                                                <p className="text-xs text-textMuted">
-                                                    {
-                                                        m.phoneNumber
-                                                    }
-                                                </p>
-                                            </div>
-
-                                            {/* <span className="px-3 py-1 rounded-full bg-red-500/10 border border-red-500/20 text-red-400 text-[10px] font-black uppercase">
-                      Expired
-                    </span> */}
-                                            <span className="px-3 py-1 rounded-full bg-red-500/10 border border-red-500/20 text-red-400 text-[10px] font-black uppercase text-center inline-flex items-center justify-center">
-                                                Expired
-                                            </span>
-                                        </div>
-
-                                        <div className="mt-5 space-y-2 text-sm">
-                                            <div className="flex justify-between">
-                                                <span className="text-textMuted">
-                                                    Plan
-                                                </span>
-
-                                                <span className="font-bold text-textMain">
-                                                    {
-                                                        m
-                                                            .membershipPlan
-                                                            .planName
-                                                    }
-                                                </span>
-                                            </div>
-
-                                            <div className="flex justify-between">
-                                                <span className="text-textMuted">
-                                                    Renewal Fee
-                                                </span>
-
-                                                <span className="font-black text-primary">
-                                                    Rs.
-                                                    {
-                                                        m
-                                                            .membershipPlan
-                                                            .price
-                                                    }
-                                                </span>
-                                            </div>
-                                        </div>
-
-                                        <button
-                                            type="button"
-                                            onClick={() => {
-                                                setRenewalPrefill(
-                                                    m
-                                                );
-
-                                                setIsModalOpen(
-                                                    true
-                                                );
-                                            }}
-                                            className="w-full mt-5 py-3 rounded-2xl bg-primary text-black font-black flex items-center justify-center gap-2"
-                                        >
-                                            Renew Membership
-
-                                            <ChevronRight className="w-4 h-4" />
-                                        </button>
-                                    </motion.div>
-                                )
-                            )}
-                        </div>
-
-                        {expiredTotalPages >
-                            1 && (
-                                <div className="mt-6">
-                                    <Pagination
-                                        page={
-                                            expiredPage
-                                        }
-                                        totalPages={
-                                            expiredTotalPages
-                                        }
-                                        count={
-                                            expiredForRenewal.length
-                                        }
-                                        pageSize={
-                                            expiredPageSize
-                                        }
-                                        onPageChange={
-                                            setExpiredPage
-                                        }
-                                        onPageSizeChange={() => { }}
-                                    />
-                                </div>
-                            )}
-                    </div>
-                )}
 
             {/* FILTERS */}
 
@@ -1035,8 +767,6 @@ export default function PaymentsPage() {
                 }}
                 onSuccess={() => {
                     refetch();
-
-                    refetchExpiredRenew();
                 }}
             />
         </div>

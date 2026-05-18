@@ -6,6 +6,7 @@ import DashboardPage from './pages/DashboardPage';
 import MembersPage from './pages/MembersPage';
 import MemberDetailPage from './pages/MemberDetailPage';
 import PaymentsPage from './pages/PaymentsPage';
+import MembershipRenewalPage from './pages/MembershipRenewalPage';
 import ReportsPage from './pages/ReportsPage';
 import SettingsPage from './pages/SettingsPage';
 import PlansPage from './pages/PlansPage';
@@ -38,6 +39,7 @@ function App() {
         <Route path="/members" element={<ProtectedRoute><AdminLayout><MembersPage /></AdminLayout></ProtectedRoute>} />
         <Route path="/members/:id" element={<ProtectedRoute><AdminLayout><MemberDetailPage /></AdminLayout></ProtectedRoute>} />
         <Route path="/payments/*" element={<ProtectedRoute><AdminLayout><PaymentsPage /></AdminLayout></ProtectedRoute>} />
+        <Route path="/renewals" element={<ProtectedRoute><AdminLayout><MembershipRenewalPage /></AdminLayout></ProtectedRoute>} />
         <Route path="/reports/*" element={<ProtectedRoute><AdminLayout><ReportsPage /></AdminLayout></ProtectedRoute>} />
         <Route path="/settings/*" element={<ProtectedRoute><AdminLayout><SettingsPage /></AdminLayout></ProtectedRoute>} />
         <Route path="/plans" element={<ProtectedRoute><AdminLayout><PlansPage /></AdminLayout></ProtectedRoute>} />
